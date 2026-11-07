@@ -1,0 +1,523 @@
+/* ===== 共通（.mp-root の中だけに効かせる） ===== */
+.mp-root {
+  font-family: var(--mp-font);
+  color: var(--mp-text);
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  text-align: left;
+}
+.mp-root *,
+.mp-root *::before,
+.mp-root *::after {
+  box-sizing: border-box;
+}
+.mp-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.mp-icon {
+  flex: none;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.mp-root [hidden] {
+  display: none !important;
+}
+
+/* DADS フォーカス：黒 4px のアウトラインに黄色 2px の帯 */
+.mp-root :focus-visible,
+.mp-as-action .mp-button:focus-visible,
+.mp-badge:focus-visible {
+  outline: 4px solid var(--mp-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--mp-focus-ring);
+}
+
+/* リンク（DADS：下線あり、hover で 3px） */
+.mp-root .mp-link,
+.mp-root a.mp-tt__course {
+  color: var(--mp-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.mp-root .mp-link:hover,
+.mp-root a.mp-tt__course:hover {
+  color: var(--mp-link-hover);
+  text-decoration-thickness: 3px;
+}
+
+/* ボタン（DADS：outline sm、text xs / sm） */
+.mp-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  font-family: var(--mp-font);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mp-button--outline {
+  min-height: 32px;
+  min-width: 72px;
+  padding: 2px 10px;
+  font-size: 14px;
+  border: 1px solid currentColor;
+  border-radius: var(--mp-radius-4);
+  background: var(--mp-surface);
+  color: var(--mp-primary);
+}
+.mp-button--outline:hover {
+  background: var(--mp-primary-outline-hover);
+  color: var(--mp-primary-hover);
+  text-decoration: underline;
+}
+.mp-button--outline:active {
+  background: var(--mp-primary-outline-active);
+  color: var(--mp-primary-active);
+}
+.mp-button--outline:disabled {
+  color: var(--mp-gray-420);
+  background: var(--mp-surface);
+  cursor: default;
+  text-decoration: none;
+}
+.mp-button--text {
+  border: 0;
+  background: transparent;
+  color: var(--mp-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.mp-button--text:hover {
+  background: var(--mp-primary-surface);
+  color: var(--mp-primary-hover);
+  text-decoration-thickness: 3px;
+}
+.mp-button--text:focus-visible {
+  background: var(--mp-focus-ring);
+}
+.mp-button--sm {
+  min-height: 36px;
+  padding: 2px 12px;
+  font-size: 16px;
+  border-radius: var(--mp-radius-6);
+}
+.mp-button--xs {
+  min-height: 28px;
+  padding: 2px 8px;
+  font-size: 14px;
+  border-radius: var(--mp-radius-4);
+}
+
+/* 入力の見出し */
+.mp-field-label {
+  display: block;
+  margin: 0 0 2px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--mp-text-strong);
+}
+
+/* セレクト（DADS：sm 40px） */
+.mp-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.mp-select {
+  appearance: none;
+  height: 32px;
+  min-width: 112px;
+  margin: 0;
+  padding: 0 32px 0 12px;
+  font-family: var(--mp-font);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--mp-text-strong);
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-border-strong);
+  border-radius: var(--mp-radius-8);
+  cursor: pointer;
+}
+.mp-select:hover {
+  border-color: var(--mp-border-emphasis);
+}
+.mp-select-wrap .mp-icon {
+  position: absolute;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+/* 学期とモジュールの切り替え（ラジオボタンを、つながったボタンの形にする） */
+.mp-segmented {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.mp-segmented__items {
+  display: inline-flex;
+}
+.mp-segmented__item {
+  position: relative;
+  display: inline-flex;
+  margin: 0;
+  cursor: pointer;
+}
+.mp-segmented__input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.mp-segmented__item > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--mp-primary);
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-primary);
+  margin-left: -1px;
+}
+.mp-segmented__item:first-child > span {
+  margin-left: 0;
+  border-radius: var(--mp-radius-8) 0 0 var(--mp-radius-8);
+}
+.mp-segmented__item:last-child > span {
+  border-radius: 0 var(--mp-radius-8) var(--mp-radius-8) 0;
+}
+.mp-segmented__input:hover + span {
+  background: var(--mp-primary-outline-hover);
+  text-decoration: underline;
+}
+.mp-segmented__input:checked + span {
+  color: var(--mp-white);
+  background: var(--mp-primary);
+  text-decoration: none;
+}
+.mp-segmented__input:focus-visible + span {
+  position: relative;
+  z-index: 1;
+  outline: 4px solid var(--mp-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--mp-focus-ring);
+}
+
+/* スケルトン */
+@keyframes mp-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+.mp-skeleton {
+  background: var(--mp-surface-strong);
+  border-radius: var(--mp-radius-4);
+  animation: mp-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mp-skeleton {
+    animation: none;
+  }
+  .mp-icon {
+    transition: none;
+  }
+}
+
+/* 通知のバナー（DADS：エラー） */
+.mp-banner {
+  padding: 12px 16px;
+  border: 2px solid var(--mp-error);
+  border-left-width: 8px;
+  border-radius: 0;
+  background: var(--mp-surface);
+}
+.mp-banner__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--mp-text-strong);
+}
+.mp-banner__body {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+/* ===== 時間割パネル ===== */
+.mp-tt {
+  /* 左右の列の外側にそろえる（左の列は padding-left: 15px） */
+  clear: both;
+  margin: 8px 2px 20px 15px;
+  font-size: 14px;
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-border);
+  border-radius: var(--mp-radius-8);
+}
+.mp-tt__heading {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+}
+.mp-tt__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  margin: 0;
+  padding: 6px 12px;
+  font-family: var(--mp-font);
+  text-align: left;
+  color: var(--mp-text-strong);
+  background: transparent;
+  border: 0;
+  border-radius: var(--mp-radius-8);
+  cursor: pointer;
+}
+.mp-tt__toggle-text {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+}
+.mp-tt__toggle:hover {
+  background: var(--mp-surface-muted);
+}
+.mp-tt__toggle:hover .mp-tt__title {
+  text-decoration: underline;
+}
+.mp-tt__toggle[aria-expanded="false"] .mp-icon {
+  transform: rotate(-90deg);
+}
+.mp-tt__title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.mp-tt__summary {
+  font-size: 14px;
+  color: var(--mp-text-muted);
+}
+.mp-tt__body {
+  padding: 0 12px 12px;
+}
+.mp-tt__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 16px;
+  padding: 4px 0 12px;
+}
+.mp-tt__reload {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.mp-tt__status {
+  margin: 0;
+  font-size: 14px;
+  color: var(--mp-text-muted);
+}
+.mp-tt__skeleton {
+  display: grid;
+  gap: 8px;
+}
+.mp-skeleton--head {
+  height: 32px;
+}
+.mp-skeleton--row {
+  height: 36px;
+}
+.mp-tt__empty {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--mp-text-muted);
+}
+.mp-tt__scroll {
+  overflow-x: auto;
+}
+.mp-root table.mp-tt__table {
+  width: 100%;
+  min-width: 560px;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 14px;
+  line-height: 1.3;
+  background: var(--mp-surface);
+}
+.mp-root .mp-tt__table th,
+.mp-root .mp-tt__table td {
+  padding: 6px 8px;
+  vertical-align: top;
+  border: 0;
+  border-right: 1px solid var(--mp-gray-200);
+  border-bottom: 1px solid var(--mp-border);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--mp-text);
+  text-align: left;
+}
+.mp-root .mp-tt__table tbody td,
+.mp-root .mp-tt__table tbody th {
+  /* コース名（16px、行の高さ 1.4）3 行分と、上下の余白 */
+  height: calc(16px * 1.4 * 3 + 12px);
+}
+.mp-root .mp-tt__table thead th {
+  font-size: 16px;
+}
+.mp-root .mp-tt__table tr > :last-child {
+  border-right: 0;
+}
+.mp-root .mp-tt__table thead th {
+  padding: 4px 6px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--mp-text-strong);
+  background: var(--mp-surface-strong);
+  border-bottom: 1px solid var(--mp-border-emphasis);
+}
+.mp-root .mp-tt__table .mp-tt__corner {
+  width: 108px;
+}
+.mp-root .mp-tt__table th.mp-tt__period {
+  text-align: center;
+  vertical-align: middle;
+  background: var(--mp-surface-muted);
+}
+.mp-tt__period-num {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mp-text-strong);
+}
+.mp-tt__period-time {
+  display: block;
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--mp-text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 720px) {
+  .mp-tt__period-time {
+    display: none;
+  }
+  .mp-root .mp-tt__table .mp-tt__corner {
+    width: 44px;
+  }
+}
+.mp-root .mp-tt__table th.mp-is-today {
+  color: var(--mp-white);
+  background: var(--mp-primary);
+}
+.mp-root .mp-tt__table td.mp-is-today {
+  background: var(--mp-blue-50);
+}
+.mp-root .mp-tt__table td.mp-is-now {
+  box-shadow: inset 0 0 0 3px var(--mp-primary);
+}
+.mp-tt__courses {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.mp-tt__courses li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: none;
+}
+.mp-root a.mp-tt__course {
+  display: block;
+  font-size: 16px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.mp-tt__others {
+  margin-top: 12px;
+}
+.mp-root .mp-tt__others-title {
+  margin: 0 0 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--mp-text-strong);
+}
+.mp-tt__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mp-tt__chips li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: none;
+}
+/* DADS チップラベル（outlined、gray）の形のリンク */
+.mp-root a.mp-tt__chip {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  min-height: 28px;
+  padding: 2px 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mp-link);
+  text-decoration: none;
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-gray-700);
+  border-radius: var(--mp-radius-8);
+}
+.mp-root a.mp-tt__chip > span:first-child {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.mp-root a.mp-tt__chip:hover {
+  background: var(--mp-primary-surface);
+}
+.mp-root a.mp-tt__chip:hover > span:first-child {
+  text-decoration-thickness: 3px;
+}
+.mp-tt__chip-note {
+  font-size: 12px;
+  color: var(--mp-text-muted);
+}

@@ -1,0 +1,73 @@
+/*
+ * デジタル庁デザインシステム（DADS）のトークンのうち、この拡張で使うもの。
+ * 値は @digital-go-jp/design-tokens 2.0.1 と、workspace-ui-template-dads のセマンティックトークンに合わせている。
+ * manaba の CSS と衝突しないよう、すべて --mp- を付ける。
+ */
+:root {
+  /* プリミティブ */
+  --mp-white: #ffffff;
+  --mp-black: #000000;
+  --mp-gray-50: #f2f2f2;
+  --mp-gray-100: #e6e6e6;
+  --mp-gray-200: #cccccc;
+  --mp-gray-420: #949494;
+  --mp-gray-536: #767676;
+  --mp-gray-600: #666666;
+  --mp-gray-700: #4d4d4d;
+  --mp-gray-800: #333333;
+  --mp-gray-900: #1a1a1a;
+  --mp-blue-50: #e8f1fe;
+  --mp-blue-100: #d9e6ff;
+  --mp-blue-200: #c5d7fb;
+  --mp-blue-300: #9db7f9;
+  --mp-blue-900: #0017c1;
+  --mp-blue-1000: #00118f;
+  --mp-blue-1200: #000060;
+  --mp-red-50: #fdeeee;
+  --mp-red-200: #ffbbbb;
+  --mp-red-900: #ce0000;
+  --mp-red-1000: #a90000;
+  --mp-orange-50: #ffeee2;
+  --mp-orange-900: #ac3e00;
+  --mp-orange-1000: #8b3200;
+  --mp-yellow-50: #fbf5e0;
+  --mp-yellow-300: #ffd43d;
+  --mp-yellow-400: #ffc700;
+  --mp-yellow-1000: #806300;
+  --mp-yellow-1100: #6e5600;
+  --mp-green-50: #e6f5ec;
+  --mp-green-800: #197a4b;
+  --mp-green-900: #115a36;
+  --mp-light-blue-50: #f0f9ff;
+  --mp-light-blue-800: #0066be;
+
+  /* セマンティック */
+  --mp-surface: var(--mp-white);
+  --mp-surface-muted: var(--mp-gray-50);
+  --mp-surface-strong: var(--mp-gray-100);
+  --mp-surface-hover: var(--mp-blue-50);
+  --mp-text: var(--mp-gray-800);
+  --mp-text-strong: var(--mp-gray-900);
+  --mp-text-muted: var(--mp-gray-600);
+  --mp-border: var(--mp-gray-420);
+  --mp-border-strong: var(--mp-gray-600);
+  --mp-border-emphasis: var(--mp-black);
+  --mp-primary: var(--mp-blue-900);
+  --mp-primary-hover: var(--mp-blue-1000);
+  --mp-primary-active: var(--mp-blue-1200);
+  --mp-primary-surface: var(--mp-blue-50);
+  --mp-primary-outline-hover: var(--mp-blue-200);
+  --mp-primary-outline-active: var(--mp-blue-300);
+  --mp-link: var(--mp-blue-1000);
+  --mp-link-hover: var(--mp-blue-900);
+  --mp-error: var(--mp-red-900);
+  --mp-error-surface: var(--mp-red-50);
+  --mp-focus: var(--mp-black);
+  --mp-focus-ring: var(--mp-yellow-300);
+
+  --mp-radius-4: 4px;
+  --mp-radius-6: 6px;
+  --mp-radius-8: 8px;
+  --mp-radius-12: 12px;
+  --mp-font: "Noto Sans JP", "Hiragino Sans", "ヒラギノ角ゴ ProN", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+}
