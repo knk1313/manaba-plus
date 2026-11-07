@@ -1,7 +1,19 @@
 // F4：オプション画面。
 import { academicYear } from "../content/timetable/module";
-import { DEFAULT_PERIODS, MODULE_KEYS, normalizeSettings, periodsForYear, type ModuleKey, type ModulePeriods, type Settings } from "../lib/settings";
-import { clearTimetableCache, getHiddenAll, getSettings, KEYS, saveSettings } from "../lib/storage";
+import {
+  dateInYear,
+  DEFAULT_PERIODS,
+  MODULE_KEYS,
+  normalizeSettings,
+  periodsForYear,
+  validatePeriods,
+  validateThresholds,
+  type ModuleKey,
+  type ModulePeriods,
+  type Settings,
+  type Thresholds,
+} from "../lib/settings";
+import { clearHiddenAll, clearTimetableCache, getHiddenAll, getSettings, saveSettings } from "../lib/storage";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -34,12 +46,6 @@ function setError(input: HTMLElement | null, errorEl: HTMLElement, message: stri
 
 // ---- モジュールの期間 ----
 
-/** 「MM-DD」を、その年度の yyyy-mm-dd にする（1〜3月は翌年）。 */
-function toDate(year: number, mmdd: string): string {
-  const m = Number(mmdd.slice(0, 2));
-  return `${m >= 4 ? year : year + 1}-${mmdd}`;
-}
-
 function periodsOf(year: number): ModulePeriods {
   return editing.get(year) ?? periodsForYear(settings, year);
 }
@@ -59,7 +65,7 @@ function renderModuleRows(): void {
       const input = document.createElement("input");
       input.type = "date";
       input.className = "op-input op-input--date";
-      input.value = toDate(currentYear, periods[key][edge]);
+      input.value = dateInYear(currentYear, periods[key][edge]);
       input.min = `${currentYear}-04-01`;
       input.max = `${currentYear + 1}-03-31`;
       input.setAttribute("aria-label", `${key}の${edge === "start" ? "開始日" : "終了日"}`);
@@ -83,20 +89,6 @@ function onModuleInput(e: Event): void {
   const periods = structuredClone(periodsOf(currentYear));
   if (/^\d{4}-\d{2}-\d{2}$/.test(input.value)) periods[key][edge] = input.value.slice(5);
   editing.set(currentYear, periods);
-}
-
-/** 期間の誤りを返す。なければ空文字。 */
-function validatePeriods(year: number, periods: ModulePeriods): string {
-  const n = (mmdd: string) => Number(toDate(year, mmdd).replaceAll("-", ""));
-  let prevEnd = 0;
-  for (const key of MODULE_KEYS) {
-    const s = n(periods[key].start);
-    const e = n(periods[key].end);
-    if (s > e) return `${year}年度の${key}は、終了日を開始日以降にしてください`;
-    if (s <= prevEnd) return `${year}年度の${key}は、前のモジュールの終了日より後に始まるようにしてください`;
-    prevEnd = e;
-  }
-  return "";
 }
 
 function renderYearOptions(): void {
@@ -130,22 +122,18 @@ function fillForm(): void {
   renderModuleRows();
 }
 
-function readThresholds(): Settings["thresholds"] | null {
-  const ids = ["th-urgent", "th-soon", "th-week"] as const;
-  const labels = ["緊急", "近い", "今週"];
-  const values: number[] = [];
-  let ok = true;
-  ids.forEach((id, i) => {
-    const input = $<HTMLInputElement>(id);
-    const v = Number(input.value);
-    let msg = "";
-    if (input.value.trim() === "" || !Number.isInteger(v) || v < 1) msg = `${labels[i]}の時間は、1以上の整数で入力してください`;
-    else if (i > 0 && values[i - 1] !== undefined && v <= values[i - 1]!) msg = `${labels[i]}の時間は、${labels[i - 1]}の時間（${values[i - 1]}）より大きくしてください`;
-    setError(input, $(`${id}-error`), msg);
-    if (msg) ok = false;
-    values.push(v);
-  });
-  return ok ? { urgentHours: values[0]!, soonHours: values[1]!, weekHours: values[2]! } : null;
+const THRESHOLD_INPUTS: Record<keyof Thresholds, string> = { urgentHours: "th-urgent", soonHours: "th-soon", weekHours: "th-week" };
+
+function readThresholds(): Thresholds | null {
+  const raw = (id: string) => $<HTMLInputElement>(id).value.trim();
+  const values = Object.fromEntries(
+    Object.entries(THRESHOLD_INPUTS).map(([key, id]) => [key, raw(id) === "" ? Number.NaN : Number(raw(id))]),
+  ) as Thresholds;
+  const errors = validateThresholds(values);
+  for (const [key, id] of Object.entries(THRESHOLD_INPUTS) as [keyof Thresholds, string][]) {
+    setError($(id), $(`${id}-error`), errors[key] ?? "");
+  }
+  return Object.keys(errors).length === 0 ? values : null;
 }
 
 async function onSubmit(e: SubmitEvent): Promise<void> {
@@ -233,9 +221,8 @@ async function main(): Promise<void> {
   $("confirm-ok").addEventListener("click", async () => {
     dialog.close();
     try {
-      const all = await getHiddenAll();
-      await chrome.storage.sync.remove([...all.keys()].map((k) => KEYS.hiddenPrefix + k));
-      showBanner(`非表示にした課題の記録を${all.size}件削除しました`, "success");
+      const n = await clearHiddenAll();
+      showBanner(`非表示にした課題の記録を${n}件削除しました`, "success");
     } catch {
       showBanner("記録を削除できませんでした。時間をおいて、もう一度お試しください。", "error");
     }

@@ -1,5 +1,5 @@
 // 日付から年度・学期・モジュールを決める。表示するコースの絞り込みもここに置く。
-import { MODULE_KEYS, type Mod, type ModuleKey, type ModulePeriods, type Term } from "../../lib/settings";
+import { dateInYear, dayNumber, MODULE_KEYS, type Mod, type ModuleKey, type ModulePeriods, type Term } from "../../lib/settings";
 import type { Schedule } from "./parser";
 
 export type Selection = { year: number; term: Term; module: Mod };
@@ -7,13 +7,6 @@ export type Selection = { year: number; term: Term; module: Mod };
 /** 4月始まりの年度。 */
 export function academicYear(date: Date): number {
   return date.getMonth() + 1 >= 4 ? date.getFullYear() : date.getFullYear() - 1;
-}
-
-/** 年度と「MM-DD」から、比べるための数（YYYYMMDD）を作る。1〜3月は翌年の日付にする。 */
-function dayNumber(year: number, mmdd: string): number {
-  const [m, d] = mmdd.split("-").map(Number) as [number, number];
-  const y = m >= 4 ? year : year + 1;
-  return y * 10000 + m * 100 + d;
 }
 
 function toDayNumber(date: Date): number {
@@ -36,7 +29,7 @@ export function detectSelection(date: Date, periodsFor: (year: number) => Module
     for (const key of MODULE_KEYS) {
       const p = periods[key];
       // 期間は順に並んでいるので、終わりが今日以降の最初のモジュールが「今」か「直後」になる
-      const end = dayNumber(year, p.end);
+      const end = dayNumber(dateInYear(year, p.end));
       if (today <= end) return { year, ...split(key) };
     }
   }

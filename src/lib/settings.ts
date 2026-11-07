@@ -62,3 +62,48 @@ export function normalizeSettings(raw: unknown): Settings {
     alwaysShowSaturday: s.alwaysShowSaturday ?? DEFAULT_SETTINGS.alwaysShowSaturday,
   };
 }
+
+/** 年度と「MM-DD」から「YYYY-MM-DD」を作る。1〜3月は翌年の日付にする。 */
+export function dateInYear(year: number, mmdd: string): string {
+  const month = Number(mmdd.slice(0, 2));
+  return `${month >= 4 ? year : year + 1}-${mmdd}`;
+}
+
+/** 「YYYY-MM-DD」を、大小を比べられる数（YYYYMMDD）にする。 */
+export function dayNumber(isoDate: string): number {
+  return Number(isoDate.replaceAll("-", ""));
+}
+
+const THRESHOLD_LABELS: Record<keyof Thresholds, string> = { urgentHours: "緊急", soonHours: "近い", weekHours: "今週" };
+const THRESHOLD_ORDER: readonly (keyof Thresholds)[] = ["urgentHours", "soonHours", "weekHours"];
+
+/** 閾値の入力の誤り。項目ごとに文言を返し、誤りがなければ空のオブジェクト。 */
+export function validateThresholds(values: Record<keyof Thresholds, number>): Partial<Record<keyof Thresholds, string>> {
+  const errors: Partial<Record<keyof Thresholds, string>> = {};
+  THRESHOLD_ORDER.forEach((key, i) => {
+    const v = values[key];
+    const label = THRESHOLD_LABELS[key];
+    if (!Number.isInteger(v) || v < 1) {
+      errors[key] = `${label}の時間は、1以上の整数で入力してください`;
+      return;
+    }
+    const prevKey = THRESHOLD_ORDER[i - 1];
+    if (prevKey && !errors[prevKey] && v <= values[prevKey]) {
+      errors[key] = `${label}の時間は、${THRESHOLD_LABELS[prevKey]}の時間（${values[prevKey]}）より大きくしてください`;
+    }
+  });
+  return errors;
+}
+
+/** モジュールの期間の誤り。誤りがなければ空文字。 */
+export function validatePeriods(year: number, periods: ModulePeriods): string {
+  let prevEnd = 0;
+  for (const key of MODULE_KEYS) {
+    const start = dayNumber(dateInYear(year, periods[key].start));
+    const end = dayNumber(dateInYear(year, periods[key].end));
+    if (start > end) return `${year}年度の${key}は、終了日を開始日以降にしてください`;
+    if (start <= prevEnd) return `${year}年度の${key}は、前のモジュールの終了日より後に始まるようにしてください`;
+    prevEnd = end;
+  }
+  return "";
+}

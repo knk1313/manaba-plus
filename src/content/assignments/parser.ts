@@ -1,5 +1,6 @@
 // 未提出課題一覧（home_library_query）の table.stdlist を読む。
 // 英語表示でも動くよう、見出しの文字ではなく、列の位置と href の形で判定する。
+import { textOf } from "../../lib/text";
 
 export type Assignment = {
   row: HTMLTableRowElement;
@@ -29,10 +30,6 @@ export function parseJstDateTime(text: string): Date | null {
   return new Date(Date.UTC(y, mo - 1, d, h - 9, mi));
 }
 
-function text(el: Element | null | undefined): string {
-  return (el?.textContent ?? "").replace(/\s+/g, " ").trim();
-}
-
 function parseRow(row: HTMLTableRowElement, index: number): Assignment | null {
   const cells = row.cells;
   if (cells.length < 5) return null;
@@ -45,9 +42,9 @@ function parseRow(row: HTMLTableRowElement, index: number): Assignment | null {
   return {
     row,
     key,
-    title: text(titleLink),
-    course: text(cells[2]),
-    deadline: parseJstDateTime(text(endCell)),
+    title: textOf(titleLink),
+    course: textOf(cells[2]),
+    deadline: parseJstDateTime(textOf(endCell)),
     index,
   };
 }

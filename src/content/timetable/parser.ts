@@ -1,5 +1,6 @@
 // ホームのコース一覧（HTML）から、コースと時限を読み取る。DOM は読むだけで変えない。
 import type { Mod, Term } from "../../lib/settings";
+import { textOf } from "../../lib/text";
 
 export const DAYS = ["月", "火", "水", "木", "金", "土", "日"] as const;
 export type Day = (typeof DAYS)[number];
@@ -84,10 +85,6 @@ export function parseSchedule(raw: string): Schedule {
   return result;
 }
 
-function text(el: Element | null | undefined): string {
-  return (el?.textContent ?? "").replace(/\s+/g, " ").trim();
-}
-
 /** サムネイル表示の div.coursecard を読む。 */
 function parseCard(card: Element): Course | null {
   const link = [...card.querySelectorAll<HTMLAnchorElement>(".course-card-title a[href]")].find((a) =>
@@ -103,13 +100,13 @@ function parseCard(card: Element): Course | null {
       .join("")
       .trim();
   }
-  const scheduleText = text(dateDd?.querySelector("span"));
+  const scheduleText = textOf(dateDd?.querySelector("span"));
   // 「担当」の dd は、日付の dd 以外の courseitemdetail
-  const teachers = text(card.querySelector("dd.courseitemdetail:not(.courseitemdetail-date)"));
+  const teachers = textOf(card.querySelector("dd.courseitemdetail:not(.courseitemdetail-date)"));
   return {
     href: link.getAttribute("href")!,
-    name: text(link),
-    code: text(card.querySelector(".coursecode")),
+    name: textOf(link),
+    code: textOf(card.querySelector(".coursecode")),
     year,
     teachers,
     schedule: parseSchedule(scheduleText),
@@ -127,12 +124,12 @@ function parseListRows(box: Element): Course[] {
       COURSE_HREF_RE.test(a.getAttribute("href") ?? ""),
     );
     if (!link) continue;
-    const cells = [...row.querySelectorAll("td")].map((c) => text(c));
+    const cells = [...row.querySelectorAll("td")].map((c) => textOf(c));
     const schedCell = cells.find((c) => /(春|秋)[ABC]+/.test(c)) ?? "";
     const schedule = parseSchedule(schedCell.replace(/^\d{4}\s*/, ""));
     courses.push({
       href: link.getAttribute("href")!,
-      name: text(link),
+      name: textOf(link),
       code: cells.find((c) => /^[0-9A-Z]{7}$/.test(c)) ?? "",
       year: /^(\d{4})/.exec(schedCell)?.[1] ?? "",
       teachers: "",

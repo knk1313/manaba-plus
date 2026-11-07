@@ -56,6 +56,13 @@ export async function removeHidden(hrefs: string[]): Promise<void> {
   await chrome.storage.sync.remove(hrefs.map((h) => KEYS.hiddenPrefix + h));
 }
 
+/** 非表示の記録をすべて消し、消した件数を返す。 */
+export async function clearHiddenAll(): Promise<number> {
+  const all = await getHiddenAll();
+  await removeHidden([...all.keys()]);
+  return all.size;
+}
+
 /** 時間割のキャッシュをすべて消す。 */
 export async function clearTimetableCache(): Promise<void> {
   const all = await chrome.storage.local.get(null);
