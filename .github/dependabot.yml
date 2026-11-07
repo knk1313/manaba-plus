@@ -1,0 +1,18 @@
+# 依存パッケージの更新を、週に1回PRで届ける。
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # 開発用の依存の小さな更新（minor・patch）は1つのPRにまとめる
+      development:
+        dependency-type: development
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
