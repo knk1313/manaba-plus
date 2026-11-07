@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "manaba plus（筑波大学）",
+  "short_name": "manaba plus",
+  "version": "0.1.0",
+  "description": "筑波大学のmanabaのホームに時間割を出し、未提出課題を締切までの残り時間で色分けします。",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://manaba.tsukuba.ac.jp/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://manaba.tsukuba.ac.jp/ct/home*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
+}
