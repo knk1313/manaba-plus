@@ -1,6 +1,6 @@
 // F1：ホームの時間割。コース一覧と課題の列の上に、全幅のパネルを出す。
 import { warn } from "../../lib/log";
-import { periodsForYear, type Settings } from "../../lib/settings";
+import { startsForYear, type Settings } from "../../lib/settings";
 import { getLocal, getSettings, KEYS, setLocal } from "../../lib/storage";
 import { academicYear, detectSelection, type Selection } from "./module";
 import { parseYearOptions } from "./parser";
@@ -35,7 +35,7 @@ export async function initTimetable(doc: Document): Promise<void> {
 
   const settings: Settings = await getSettings();
   const now = new Date();
-  const current = detectSelection(now, (y) => periodsForYear(settings, y));
+  const current = detectSelection(now, (y) => startsForYear(settings, y));
 
   let years = parseYearOptions(doc);
   if (years.length === 0) {

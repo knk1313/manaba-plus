@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PERIODS } from "../src/lib/modulePeriods";
-import { DEFAULT_SETTINGS, normalizeSettings, periodsForYear, validateThresholds } from "../src/lib/settings";
+import { builtinStarts, DEFAULT_STARTS } from "../src/lib/modulePeriods";
+import { DEFAULT_SETTINGS, normalizeSettings, startsForYear, validateThresholds } from "../src/lib/settings";
 
 describe("validateThresholds", () => {
   it("既定値は誤りなし", () => {
@@ -33,11 +33,18 @@ describe("normalizeSettings", () => {
   });
 });
 
-describe("periodsForYear", () => {
-  it("オプション画面での上書きが、拡張機能の期間より優先される", () => {
-    const settings = { ...DEFAULT_SETTINGS, modulePeriodsByYear: { "2026": { 秋A: { start: "10-02", end: "11-09" } } } };
-    expect(periodsForYear(settings, 2026).秋A).toEqual({ start: "10-02", end: "11-09" });
-    expect(periodsForYear(settings, 2026).秋B).toEqual(DEFAULT_PERIODS.秋B);
-    expect(periodsForYear(settings, 2027).秋A).toEqual(DEFAULT_PERIODS.秋A);
+describe("startsForYear", () => {
+  it("オプション画面での上書きが、拡張機能の開始日より優先される", () => {
+    const settings = { ...DEFAULT_SETTINGS, moduleStartsByYear: { "2026": { 秋A: "10-02" } } };
+    expect(startsForYear(settings, 2026).秋A).toBe("10-02");
+    expect(startsForYear(settings, 2026).秋B).toBe(builtinStarts(2026).秋B);
+    expect(startsForYear(settings, 2030).秋A).toBe(DEFAULT_STARTS.秋A);
+  });
+});
+
+describe("normalizeSettings（以前の版の保存データ）", () => {
+  it("開始日と終了日の形から、開始日だけを取り出す", () => {
+    const old = { modulePeriodsByYear: { "2026": { 秋A: { start: "10-02", end: "11-10" } } } };
+    expect(normalizeSettings(old).moduleStartsByYear).toEqual({ "2026": { 秋A: "10-02" } });
   });
 });

@@ -1,22 +1,14 @@
 // F4：オプション画面。
 import { academicYear } from "../content/timetable/module";
-import {
-  builtinPeriods,
-  dateInYear,
-  hasBuiltinCalendar,
-  MODULE_KEYS,
-  validatePeriods,
-  type ModuleKey,
-  type ModulePeriods,
-} from "../lib/modulePeriods";
-import { normalizeSettings, periodsForYear, validateThresholds, type Settings, type Thresholds } from "../lib/settings";
+import { builtinStarts, dateInYear, hasBuiltinCalendar, MODULE_KEYS, validateStarts, type ModuleKey, type ModuleStarts } from "../lib/modulePeriods";
+import { normalizeSettings, startsForYear, validateThresholds, type Settings, type Thresholds } from "../lib/settings";
 import { clearHiddenAll, clearTimetableCache, getHiddenAll, getSettings, saveSettings } from "../lib/storage";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 let settings: Settings;
-/** 年度ごとに編集中の期間（保存するまでここに持つ） */
-const editing = new Map<number, ModulePeriods>();
+/** 年度ごとに編集中の開始日（保存するまでここに持つ） */
+const editing = new Map<number, ModuleStarts>();
 let currentYear = academicYear(new Date());
 
 function showBanner(message: string, kind: "success" | "error"): void {
@@ -41,65 +33,60 @@ function setError(input: HTMLElement | null, errorEl: HTMLElement, message: stri
   }
 }
 
-// ---- モジュールの期間 ----
+// ---- モジュールの開始日 ----
 
-function periodsOf(year: number): ModulePeriods {
-  return editing.get(year) ?? periodsForYear(settings, year);
+function startsOf(year: number): ModuleStarts {
+  return editing.get(year) ?? startsForYear(settings, year);
 }
 
 function renderModuleRows(): void {
   const tbody = $("mod-rows");
   tbody.replaceChildren();
-  const periods = periodsOf(currentYear);
+  const starts = startsOf(currentYear);
   for (const key of MODULE_KEYS) {
-    const tr = document.createElement("tr");
     const th = document.createElement("th");
     th.scope = "row";
     th.textContent = key;
-    tr.append(th);
-    for (const edge of ["start", "end"] as const) {
-      const td = document.createElement("td");
-      const input = document.createElement("input");
-      input.type = "date";
-      input.className = "op-input op-input--date";
-      input.value = dateInYear(currentYear, periods[key][edge]);
-      input.min = `${currentYear}-04-01`;
-      input.max = `${currentYear + 1}-03-31`;
-      input.setAttribute("aria-label", `${key}の${edge === "start" ? "開始日" : "終了日"}`);
-      input.dataset.key = key;
-      input.dataset.edge = edge;
-      input.addEventListener("change", onModuleInput);
-      td.append(input);
-      tr.append(td);
-    }
+    const input = document.createElement("input");
+    input.type = "date";
+    input.className = "op-input op-input--date";
+    input.value = dateInYear(currentYear, starts[key]);
+    input.min = `${currentYear}-04-01`;
+    input.max = `${currentYear + 1}-03-31`;
+    input.setAttribute("aria-label", `${key}の開始日`);
+    input.dataset.key = key;
+    input.addEventListener("change", onModuleInput);
+    const td = document.createElement("td");
+    td.append(input);
+    const tr = document.createElement("tr");
+    tr.append(th, td);
     tbody.append(tr);
   }
-  $("mod-note").textContent = periodsNote(currentYear);
+  $("mod-note").textContent = startsNote(currentYear);
   setError(null, $("mod-error"), "");
 }
 
-/** その年度に、どの期間を使っているかの説明。 */
-function periodsNote(year: number): string {
-  const overridden = settings.modulePeriodsByYear[String(year)] !== undefined || editing.has(year);
-  if (overridden) return `${year}年度は、ここで変更した期間を使っています。`;
+/** その年度に、どの開始日を使っているかの説明。 */
+function startsNote(year: number): string {
+  const overridden = settings.moduleStartsByYear[String(year)] !== undefined || editing.has(year);
+  if (overridden) return `${year}年度は、ここで変更した開始日を使っています。`;
   return hasBuiltinCalendar(year)
-    ? `${year}年度は、拡張機能に入っている学年暦の期間を使っています。`
-    : `${year}年度は、目安の期間を使っています。大学の学年暦と違うときは直してください。`;
+    ? `${year}年度は、拡張機能に入っている学年暦の開始日を使っています。`
+    : `${year}年度は、目安の開始日を使っています。大学の学年暦と違うときは直してください。`;
 }
 
 function onModuleInput(e: Event): void {
   const input = e.target as HTMLInputElement;
   const key = input.dataset.key as ModuleKey;
-  const edge = input.dataset.edge as "start" | "end";
-  const periods = structuredClone(periodsOf(currentYear));
-  if (/^\d{4}-\d{2}-\d{2}$/.test(input.value)) periods[key][edge] = input.value.slice(5);
-  editing.set(currentYear, periods);
+  const starts = { ...startsOf(currentYear) };
+  if (/^\d{4}-\d{2}-\d{2}$/.test(input.value)) starts[key] = input.value.slice(5);
+  editing.set(currentYear, starts);
 }
 
 function renderYearOptions(): void {
   const select = $<HTMLSelectElement>("mod-year");
   const base = academicYear(new Date());
-  const years = new Set<number>([base - 1, base, base + 1, ...Object.keys(settings.modulePeriodsByYear).map(Number)]);
+  const years = new Set<number>([base - 1, base, base + 1, ...Object.keys(settings.moduleStartsByYear).map(Number)]);
   select.replaceChildren(
     ...[...years]
       .sort((a, b) => b - a)
@@ -145,8 +132,8 @@ async function onSubmit(e: SubmitEvent): Promise<void> {
   e.preventDefault();
   const thresholds = readThresholds();
   let periodError = "";
-  for (const [year, periods] of editing) {
-    periodError = validatePeriods(year, periods);
+  for (const [year, starts] of editing) {
+    periodError = validateStarts(year, starts);
     if (periodError) {
       if (year !== currentYear) {
         currentYear = year;
@@ -163,19 +150,18 @@ async function onSubmit(e: SubmitEvent): Promise<void> {
     firstInvalid?.focus();
     return;
   }
-  const byYear = { ...settings.modulePeriodsByYear };
-  for (const [year, periods] of editing) {
-    const diff: Partial<ModulePeriods> = {};
-    for (const key of MODULE_KEYS) {
-      const base = builtinPeriods(year)[key];
-      if (periods[key].start !== base.start || periods[key].end !== base.end) diff[key] = periods[key];
-    }
+  const byYear = { ...settings.moduleStartsByYear };
+  for (const [year, starts] of editing) {
+    // 拡張機能に入っている開始日と違うモジュールだけを保存する
+    const base = builtinStarts(year);
+    const diff: Partial<ModuleStarts> = {};
+    for (const key of MODULE_KEYS) if (starts[key] !== base[key]) diff[key] = starts[key];
     if (Object.keys(diff).length > 0) byYear[String(year)] = diff;
     else delete byYear[String(year)];
   }
   const next: Settings = {
     thresholds,
-    modulePeriodsByYear: byYear,
+    moduleStartsByYear: byYear,
     panelDefaultOpen: document.querySelector<HTMLInputElement>('input[name="panel-default"]:checked')?.value !== "closed",
     alwaysShowSaturday: $<HTMLInputElement>("always-sat").checked,
   };
@@ -208,9 +194,9 @@ async function main(): Promise<void> {
     renderModuleRows();
   });
   $("mod-reset").addEventListener("click", () => {
-    editing.set(currentYear, structuredClone(builtinPeriods(currentYear)));
+    editing.set(currentYear, builtinStarts(currentYear));
     renderModuleRows();
-    $("mod-note").textContent = `${currentYear}年度を、拡張機能に入っている期間に戻しました。「保存する」を押すと確定します。`;
+    $("mod-note").textContent = `${currentYear}年度を、拡張機能に入っている開始日に戻しました。「保存する」を押すと確定します。`;
   });
   $("clear-cache").addEventListener("click", async () => {
     try {

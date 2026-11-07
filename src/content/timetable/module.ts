@@ -1,5 +1,5 @@
 // 日付から年度・学期・モジュールを決める。表示するコースの絞り込みもここに置く。
-import { dateInYear, dayNumber, MODULE_KEYS, type Mod, type ModuleKey, type ModulePeriods, type Term } from "../../lib/modulePeriods";
+import { dateInYear, dayNumber, MODULE_KEYS, type Mod, type ModuleKey, type ModuleStarts, type Term } from "../../lib/modulePeriods";
 import type { Schedule } from "./parser";
 
 export type Selection = { year: number; term: Term; module: Mod };
@@ -18,22 +18,21 @@ function split(key: ModuleKey): { term: Term; module: Mod } {
 }
 
 /**
- * 今日がどのモジュールかを決める。どの期間にも入らない日（休業期間）は、直後のモジュールを選ぶ。
- * periodsFor は年度ごとの期間を返す（オプション画面での上書きを反映するため）。
+ * 今日がどのモジュールかを決める。開始日が今日以前のモジュールのうち、いちばん新しいものを選ぶ。
+ * 休業期間は直前のモジュールになる。4月の春Aの開始日より前は、前の年度の秋Cになる。
+ * startsFor は年度ごとの開始日を返す（オプション画面での上書きを反映するため）。
  */
-export function detectSelection(date: Date, periodsFor: (year: number) => ModulePeriods): Selection {
+export function detectSelection(date: Date, startsFor: (year: number) => ModuleStarts): Selection {
   const today = toDayNumber(date);
   const ay = academicYear(date);
-  for (const year of [ay, ay + 1]) {
-    const periods = periodsFor(year);
+  let found: Selection | null = null;
+  for (const year of [ay - 1, ay]) {
+    const starts = startsFor(year);
     for (const key of MODULE_KEYS) {
-      const p = periods[key];
-      // 期間は順に並んでいるので、終わりが今日以降の最初のモジュールが「今」か「直後」になる
-      const end = dayNumber(dateInYear(year, p.end));
-      if (today <= end) return { year, ...split(key) };
+      if (dayNumber(dateInYear(year, starts[key])) <= today) found = { year, ...split(key) };
     }
   }
-  return { year: ay + 1, term: "春", module: "A" };
+  return found ?? { year: ay, term: "春", module: "A" };
 }
 
 /** 選んだ学期とモジュールの授業か。 */

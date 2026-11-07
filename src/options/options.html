@@ -10,7 +10,7 @@
   <body>
     <main class="op-main">
       <h1 class="op-title">manaba plus の設定</h1>
-      <p class="op-lead">締切の色分け、モジュールの期間、時間割の表示を変えられます。</p>
+      <p class="op-lead">締切の色分け、モジュールの開始日、時間割の表示を変えられます。</p>
 
       <div id="banner" class="op-banner" role="status" hidden></div>
 
@@ -38,22 +38,22 @@
         </section>
 
         <section class="op-section" aria-labelledby="h-modules">
-          <h2 id="h-modules" class="op-h2">モジュールの期間</h2>
-          <p class="op-support">時間割を開いたときに、今日がどのモジュールかを決めるのに使います。拡張機能に入っている期間が大学の学年暦と違うときは、ここで直してください。どの期間にも入らない日は、直後のモジュールを選びます。</p>
+          <h2 id="h-modules" class="op-h2">モジュールの開始日</h2>
+          <p class="op-support">時間割を開いたときに、今日がどのモジュールかを決めるのに使います。各モジュールは、次のモジュールの開始日の前日まで続くものとして扱います。休業期間は、直前のモジュールになります。拡張機能に入っている開始日が大学の学年暦と違うときは、ここで直してください。</p>
           <div class="op-field">
             <label for="mod-year" class="op-label">年度</label>
             <div class="op-select-wrap"><select id="mod-year" class="op-select"></select></div>
           </div>
           <table class="op-table">
-            <caption class="op-visually-hidden">モジュールごとの開始日と終了日</caption>
+            <caption class="op-visually-hidden">モジュールごとの開始日</caption>
             <thead>
-              <tr><th scope="col">モジュール</th><th scope="col">開始日</th><th scope="col">終了日</th></tr>
+              <tr><th scope="col">モジュール</th><th scope="col">開始日</th></tr>
             </thead>
             <tbody id="mod-rows"></tbody>
           </table>
           <p id="mod-error" class="op-error" tabindex="-1" hidden></p>
           <p id="mod-note" class="op-support"></p>
-          <button type="button" id="mod-reset" class="op-button op-button--text">この年度を拡張機能に入っている期間に戻す</button>
+          <button type="button" id="mod-reset" class="op-button op-button--text">この年度を拡張機能に入っている開始日に戻す</button>
         </section>
 
         <section class="op-section" aria-labelledby="h-panel">

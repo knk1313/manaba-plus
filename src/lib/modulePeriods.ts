@@ -1,5 +1,7 @@
-// 学期とモジュール、モジュールの期間の定義。
-// 期間は年度ごとに変わる。新しい年度の学年暦が出たら、PERIODS_BY_YEAR に年度を足す。
+// 学期とモジュール、モジュールの開始日の定義。
+// 各モジュールは、次のモジュールの開始日の前日まで続くものとして扱う（休業期間は直前のモジュール）。
+// 終了日は持たない。学年暦で確かめられる開始日だけで決めるため。
+// 開始日は年度ごとに変わる。新しい年度の学年暦が出たら、STARTS_BY_YEAR に年度を足す。
 
 export type Term = "春" | "秋";
 export type Mod = "A" | "B" | "C";
@@ -9,40 +11,36 @@ export const TERMS: readonly Term[] = ["春", "秋"];
 export const MODS: readonly Mod[] = ["A", "B", "C"];
 export const MODULE_KEYS: readonly ModuleKey[] = ["春A", "春B", "春C", "秋A", "秋B", "秋C"];
 
-/** モジュールの期間。日付は「MM-DD」。1〜3月の日付は、その年度の翌年の日付として扱う。 */
-export type Period = { start: string; end: string };
-export type ModulePeriods = Record<ModuleKey, Period>;
+/** モジュールごとの開始日。日付は「MM-DD」。1〜3月の日付は、その年度の翌年の日付として扱う。 */
+export type ModuleStarts = Record<ModuleKey, string>;
 
-/** PERIODS_BY_YEAR にない年度で使う、目安の期間。 */
-export const DEFAULT_PERIODS: ModulePeriods = {
-  春A: { start: "04-08", end: "05-20" },
-  春B: { start: "05-21", end: "06-30" },
-  春C: { start: "07-01", end: "08-10" },
-  秋A: { start: "10-01", end: "11-10" },
-  秋B: { start: "11-11", end: "12-26" },
-  秋C: { start: "01-05", end: "02-15" },
+type StartsTable = Readonly<Record<number, Partial<ModuleStarts>>>;
+
+/** STARTS_BY_YEAR にない年度で使う、目安の開始日。 */
+export const DEFAULT_STARTS: ModuleStarts = {
+  春A: "04-08",
+  春B: "05-21",
+  春C: "07-01",
+  秋A: "10-01",
+  秋B: "11-11",
+  秋C: "01-05",
 };
 
 /**
- * 大学の学年暦から写した、年度ごとの期間。キーは年度（4月始まり）。
- * 書いたモジュールだけが DEFAULT_PERIODS を上書きする。
- * 例：
- *   2027: {
- *     春A: { start: "04-12", end: "05-21" },
- *     秋C: { start: "01-06", end: "02-14" }, // 2028年1月6日〜2月14日
- *   },
+ * 大学の学年暦から写した、年度ごとの開始日。キーは年度（4月始まり）。
+ * 書いたモジュールだけが DEFAULT_STARTS を上書きする。
  */
-export const PERIODS_BY_YEAR: Readonly<Record<number, Partial<ModulePeriods>>> = {
-  // 2026年度は学年暦をまだ写していないため、目安の期間を使う
+export const STARTS_BY_YEAR: StartsTable = {
+  2026: { 春A: "04-14", 春B: "05-26", 春C: "07-02", 秋A: "10-01", 秋B: "11-12", 秋C: "01-06" },
 };
 
-/** 拡張機能に入っている、その年度の期間（学年暦がなければ目安の期間）。 */
-export function builtinPeriods(year: number, table: Readonly<Record<number, Partial<ModulePeriods>>> = PERIODS_BY_YEAR): ModulePeriods {
-  return { ...DEFAULT_PERIODS, ...(table[year] ?? {}) };
+/** 拡張機能に入っている、その年度の開始日（学年暦がなければ目安）。 */
+export function builtinStarts(year: number, table: StartsTable = STARTS_BY_YEAR): ModuleStarts {
+  return { ...DEFAULT_STARTS, ...(table[year] ?? {}) };
 }
 
-/** その年度の学年暦が PERIODS_BY_YEAR に入っているか。 */
-export function hasBuiltinCalendar(year: number, table: Readonly<Record<number, Partial<ModulePeriods>>> = PERIODS_BY_YEAR): boolean {
+/** その年度の学年暦が STARTS_BY_YEAR に入っているか。 */
+export function hasBuiltinCalendar(year: number, table: StartsTable = STARTS_BY_YEAR): boolean {
   return table[year] !== undefined;
 }
 
@@ -57,15 +55,15 @@ export function dayNumber(isoDate: string): number {
   return Number(isoDate.replaceAll("-", ""));
 }
 
-/** モジュールの期間の誤り。誤りがなければ空文字。 */
-export function validatePeriods(year: number, periods: ModulePeriods): string {
-  let prevEnd = 0;
+/** 開始日の誤り（春Aから秋Cへ順に後になっていない）。誤りがなければ空文字。 */
+export function validateStarts(year: number, starts: ModuleStarts): string {
+  let prev = 0;
+  let prevKey: ModuleKey | null = null;
   for (const key of MODULE_KEYS) {
-    const start = dayNumber(dateInYear(year, periods[key].start));
-    const end = dayNumber(dateInYear(year, periods[key].end));
-    if (start > end) return `${year}年度の${key}は、終了日を開始日以降にしてください`;
-    if (start <= prevEnd) return `${year}年度の${key}は、前のモジュールの終了日より後に始まるようにしてください`;
-    prevEnd = end;
+    const day = dayNumber(dateInYear(year, starts[key]));
+    if (prevKey && day <= prev) return `${year}年度の${key}の開始日は、${prevKey}の開始日より後にしてください`;
+    prev = day;
+    prevKey = key;
   }
   return "";
 }
