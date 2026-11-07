@@ -232,10 +232,6 @@ export class TimetablePanel {
     this.syncControls();
   }
 
-  isOpen(): boolean {
-    return this.toggle.getAttribute("aria-expanded") === "true";
-  }
-
   setOpen(open: boolean, fromUser = false): void {
     this.toggle.setAttribute("aria-expanded", String(open));
     this.bodyEl.hidden = !open;

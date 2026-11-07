@@ -3,16 +3,11 @@ import { warn } from "../../lib/log";
 import { periodsForYear, type Settings } from "../../lib/settings";
 import { getLocal, getSettings, KEYS, setLocal } from "../../lib/storage";
 import { academicYear, detectSelection, type Selection } from "./module";
-import { parseCoursePage, parseYearOptions, type Course } from "./parser";
+import { parseYearOptions } from "./parser";
 import { buildTimetable, TimetablePanel } from "./render";
+import { loadCourses, type LoadResult } from "./source";
 
-const CACHE_TTL = 6 * 60 * 60 * 1000;
-const CACHE_VERSION = 1;
-
-type CacheEntry = { v: number; fetchedAt: number; courses: Course[] };
 type SavedSelection = { date: string; selection: Selection };
-
-type LoadResult = { kind: "ok"; courses: Course[]; fetchedAt: number } | { kind: "login" } | { kind: "unknown" } | { kind: "error" };
 
 function todayKey(d: Date): string {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
@@ -23,36 +18,12 @@ function formatFetchedAt(t: number): string {
   return `${d.getMonth() + 1}月${d.getDate()}日 ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}時点`;
 }
 
-async function loadCourses(year: number, force: boolean): Promise<LoadResult> {
-  const cacheKey = KEYS.cachePrefix + year;
-  if (!force) {
-    const cached = await getLocal<CacheEntry>(cacheKey);
-    if (cached && cached.v === CACHE_VERSION && Date.now() - cached.fetchedAt < CACHE_TTL) {
-      return { kind: "ok", courses: cached.courses, fetchedAt: cached.fetchedAt };
-    }
-  }
-  let html: string;
-  try {
-    // この URL は表示の設定（現在のコース、一覧の形式）を変えない
-    const res = await fetch(`home__all_y${year}`, { credentials: "include" });
-    if (!res.ok) {
-      warn(`コース一覧の取得に失敗しました（HTTP ${res.status}）`);
-      return { kind: "error" };
-    }
-    html = await res.text();
-  } catch (e) {
-    warn("コース一覧の取得に失敗しました", e);
-    return { kind: "error" };
-  }
-  const result = parseCoursePage(new DOMParser().parseFromString(html, "text/html"));
-  if (result.kind !== "ok") {
-    warn(result.kind === "login" ? "取得した HTML にコース一覧がありません（ログイン切れ）" : "コース一覧の形式を読み取れませんでした");
-    return result;
-  }
-  const entry: CacheEntry = { v: CACHE_VERSION, fetchedAt: Date.now(), courses: result.courses };
-  await setLocal(cacheKey, entry).catch((e) => warn("時間割のキャッシュを保存できませんでした", e));
-  return { kind: "ok", courses: result.courses, fetchedAt: entry.fetchedAt };
-}
+/** 読み込めなかったときの説明。 */
+const FAILURE_MESSAGES: Record<Exclude<LoadResult["kind"], "ok">, { body: string; link?: { href: string; label: string } }> = {
+  login: { body: "ログインの期限が切れています。manabaに再ログインしてください。", link: { href: "/ct/home", label: "manabaのホームを開き直す" } },
+  unknown: { body: "コース一覧の形式を読み取れませんでした。" },
+  error: { body: "通信に失敗しました。時間をおいて、もう一度お試しください。" },
+};
 
 export async function initTimetable(doc: Document): Promise<void> {
   const left = doc.querySelector("div.contentbody-left");
@@ -91,28 +62,17 @@ export async function initTimetable(doc: Document): Promise<void> {
     panel.setStatus(force ? "読み込んでいます" : "");
     const result = await loadCourses(sel.year, force);
     if (id !== requestId) return; // 古い要求の結果は捨てる
-    switch (result.kind) {
-      case "ok": {
-        const isCurrent = sel.year === current.year && sel.term === current.term && sel.module === current.module;
-        panel.showTable(
-          buildTimetable({ courses: result.courses, selection: sel, alwaysShowSaturday: settings.alwaysShowSaturday, now: isCurrent ? new Date() : null }),
-        );
-        panel.setStatus(formatFetchedAt(result.fetchedAt));
-        break;
-      }
-      case "login":
-        panel.showMessage("時間割を読み込めませんでした", "ログインの期限が切れています。manabaに再ログインしてください。", { href: "/ct/home", label: "manabaのホームを開き直す" });
-        panel.setStatus("");
-        break;
-      case "unknown":
-        panel.showMessage("時間割を読み込めませんでした", "コース一覧の形式を読み取れませんでした。");
-        panel.setStatus("");
-        break;
-      case "error":
-        panel.showMessage("時間割を読み込めませんでした", "通信に失敗しました。時間をおいて、もう一度お試しください。");
-        panel.setStatus("");
-        break;
+    if (result.kind !== "ok") {
+      const { body, link } = FAILURE_MESSAGES[result.kind];
+      panel.showMessage("時間割を読み込めませんでした", body, link);
+      panel.setStatus("");
+      return;
     }
+    const isCurrent = sel.year === current.year && sel.term === current.term && sel.module === current.module;
+    panel.showTable(
+      buildTimetable({ courses: result.courses, selection: sel, alwaysShowSaturday: settings.alwaysShowSaturday, now: isCurrent ? new Date() : null }),
+    );
+    panel.setStatus(formatFetchedAt(result.fetchedAt));
   };
 
   const panel = new TimetablePanel(years, selection, open, {
