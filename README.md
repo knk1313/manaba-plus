@@ -95,10 +95,12 @@ src/
 │   ├── main.ts            # content script の入口
 │   ├── router.ts          # ページを判定して機能を選ぶ
 │   ├── tokens.css         # DADS のトークン（--mp-*）
-│   ├── timetable/         # 時間割：parser / module / render / index / style.css
-│   └── assignments/       # 課題：parser / deadline / index / style.css
+│   ├── common.css         # 時間割と課題一覧で共通の部品（ボタン、フォーカスなど）
+│   ├── dom.ts / icons.ts  # 要素とアイコンを作る関数
+│   ├── timetable/         # 時間割：parser / module / source（取得とキャッシュ）/ render / index / style.css
+│   └── assignments/       # 課題：parser / deadline / render / index / style.css
 ├── options/               # オプションの画面
-└── lib/                   # 設定と chrome.storage のラッパー
+└── lib/                   # 設定と入力の検査、chrome.storage のラッパー
 tests/
 ├── fixtures/              # manaba の HTML を基にしたフィクスチャ（個人名は伏せています）
 └── *.test.ts
