@@ -104,6 +104,30 @@ table.stdlist.mp-as-table tr td:nth-child(1) {
 table.stdlist.mp-as-table tr td:nth-child(1) a {
   color: var(--mp-text-muted);
 }
+/* タイプのアイコン */
+table.stdlist.mp-as-table tr.title th:first-child,
+table.stdlist.mp-as-table tr td.mp-as-type {
+  width: 1%;
+  text-align: center;
+}
+table.stdlist.mp-as-table tr td.mp-as-type a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--mp-gray-700);
+  border-radius: var(--mp-radius-6);
+}
+table.stdlist.mp-as-table tr td.mp-as-type a:hover {
+  color: var(--mp-link-hover);
+  background: var(--mp-primary-surface);
+}
+table.stdlist.mp-as-table tr td.mp-as-type a:focus-visible {
+  outline: 4px solid var(--mp-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--mp-focus-ring);
+}
 table.stdlist.mp-as-table tr td:nth-child(3) {
   font-size: 14px;
 }

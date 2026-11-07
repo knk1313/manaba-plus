@@ -2,7 +2,7 @@
 import { warn } from "../../lib/log";
 import type { Thresholds } from "../../lib/settings";
 import { getHiddenAll, getLocal, getSettings, KEYS, removeHidden, setHidden, setLocal, type HiddenEntry } from "../../lib/storage";
-import { h, uniqueId } from "../dom";
+import { h, icon, uniqueId, type IconName } from "../dom";
 import { classify, compareByDeadline, formatRemaining, isExpiredHidden, LEVEL_LABEL, LEVELS, type Level } from "./deadline";
 import { findAssignmentTable, type Assignment, type AssignmentTable } from "./parser";
 
@@ -22,6 +22,17 @@ function switchControl(label: string, checked: boolean, onChange: (v: boolean) =
   input.addEventListener("change", () => onChange(input.checked));
   const text = h("span", { class: "mp-switch__label" }, label);
   return { root: h("label", { class: "mp-switch" }, input, h("span", { class: "mp-switch__track", "aria-hidden": "true" }), text), input, text };
+}
+
+/** タイプの列の文字（レポート、アンケートなど）をアイコンにする。文字は読み上げ用に隠して残す。 */
+function iconizeType(cell: HTMLTableCellElement): void {
+  const link = cell.querySelector<HTMLAnchorElement>("a[href]");
+  const kind = /_(report|survey|query)(?:[?#]|$)/.exec(link?.getAttribute("href") ?? "")?.[1] as IconName | undefined;
+  if (!link || !kind) return; // 知らない種類は文字のまま
+  const label = (link.textContent ?? "").trim();
+  cell.classList.add("mp-as-type");
+  link.title = label;
+  link.replaceChildren(icon(kind), h("span", { class: "mp-visually-hidden" }, label));
 }
 
 class AssignmentsController {
@@ -48,6 +59,7 @@ class AssignmentsController {
       t.headerRow.append(h(cellTag, { class: "mp-as-col-head", scope: cellTag === "th" ? "col" : null }, "操作"));
     }
     for (const item of t.items) {
+      iconizeType(item.row.cells[0]!);
       const badge = h("span", { class: "mp-badge" });
       const titleCell = item.row.cells[1]!;
       titleCell.classList.add("mp-as-title-cell");
