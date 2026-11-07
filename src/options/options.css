@@ -1,0 +1,322 @@
+/* オプション画面。トークンは tokens.css（DADS）を使う。 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  color-scheme: light;
+}
+body {
+  margin: 0;
+  font-family: var(--mp-font);
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--mp-text);
+  background: var(--mp-gray-50);
+}
+:focus-visible {
+  outline: 4px solid var(--mp-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--mp-focus-ring);
+}
+[hidden] {
+  display: none !important;
+}
+.op-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+.op-main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 16px 64px;
+}
+.op-title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--mp-text-strong);
+}
+.op-lead {
+  margin: 0 0 24px;
+}
+.op-section {
+  margin: 0 0 24px;
+  padding: 24px;
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-gray-536);
+  border-radius: var(--mp-radius-12);
+}
+.op-h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--mp-text-strong);
+}
+.op-h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--mp-text-strong);
+}
+.op-support {
+  margin: 0 0 16px;
+  font-size: 16px;
+  color: var(--mp-text-muted);
+}
+.op-fields-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+}
+.op-field {
+  margin: 0 0 16px;
+}
+.op-label {
+  display: block;
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--mp-text-strong);
+}
+.op-input-unit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.op-input {
+  height: 48px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--mp-text-strong);
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-border-strong);
+  border-radius: var(--mp-radius-8);
+}
+.op-input:hover {
+  border-color: var(--mp-border-emphasis);
+}
+.op-input[aria-invalid="true"] {
+  border-color: var(--mp-error);
+}
+.op-input--num {
+  width: 120px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.op-input--date {
+  height: 40px;
+  padding: 0 12px;
+}
+.op-error {
+  margin: 8px 0 0;
+  font-size: 16px;
+  color: var(--mp-error);
+}
+.op-select-wrap {
+  position: relative;
+  display: inline-block;
+}
+.op-select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -6px;
+  border-right: 2px solid var(--mp-text);
+  border-bottom: 2px solid var(--mp-text);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.op-select {
+  appearance: none;
+  height: 48px;
+  min-width: 160px;
+  padding: 0 44px 0 16px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--mp-text-strong);
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-border-strong);
+  border-radius: var(--mp-radius-8);
+}
+.op-table {
+  width: 100%;
+  margin: 0 0 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.op-table th,
+.op-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--mp-border);
+}
+.op-table thead th {
+  background: var(--mp-surface-strong);
+  border-bottom-color: var(--mp-border-emphasis);
+  color: var(--mp-text-strong);
+}
+.op-table tbody th {
+  font-weight: 700;
+  color: var(--mp-text-strong);
+}
+.op-fieldset {
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+}
+.op-radio,
+.op-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.op-radio input,
+.op-checkbox input {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--mp-primary);
+  cursor: pointer;
+}
+.op-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 32px;
+}
+.op-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 96px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  border-radius: var(--mp-radius-8);
+  cursor: pointer;
+}
+.op-button--primary {
+  color: var(--mp-white);
+  background: var(--mp-primary);
+  border: 4px double transparent;
+}
+.op-button--primary:hover {
+  background: var(--mp-primary-hover);
+  text-decoration: underline;
+}
+.op-button--primary:active {
+  background: var(--mp-primary-active);
+}
+.op-button--outline {
+  color: var(--mp-primary);
+  background: var(--mp-surface);
+  border: 1px solid currentColor;
+}
+.op-button--outline:hover {
+  color: var(--mp-primary-hover);
+  background: var(--mp-primary-outline-hover);
+  text-decoration: underline;
+}
+.op-button--danger {
+  color: var(--mp-error);
+}
+.op-button--danger:hover {
+  color: var(--mp-red-1000);
+  background: var(--mp-red-200);
+}
+.op-button--danger-fill {
+  background: var(--mp-error);
+}
+.op-button--danger-fill:hover {
+  background: var(--mp-red-1000);
+}
+.op-button:disabled {
+  color: var(--mp-gray-420);
+  background: var(--mp-surface);
+  border-color: var(--mp-gray-200);
+  text-decoration: none;
+  cursor: default;
+}
+.op-button--text {
+  min-height: 44px;
+  padding: 4px 12px;
+  color: var(--mp-primary);
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.op-button--text:hover {
+  background: var(--mp-primary-surface);
+  text-decoration-thickness: 3px;
+}
+.op-data-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 16px 0;
+  border-top: 1px solid var(--mp-border);
+}
+.op-data-item .op-support {
+  margin: 0;
+}
+.op-banner {
+  margin: 0 0 24px;
+  padding: 16px 24px;
+  font-weight: 700;
+  background: var(--mp-surface);
+  border: 2px solid;
+  border-left-width: 8px;
+}
+.op-banner--success {
+  border-color: var(--mp-green-800);
+}
+.op-banner--error {
+  border-color: var(--mp-error);
+}
+.op-dialog {
+  width: min(480px, calc(100% - 32px));
+  padding: 24px;
+  border: 0;
+  border-radius: var(--mp-radius-12);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+.op-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+.op-dialog__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+@media (max-width: 600px) {
+  .op-section {
+    padding: 16px;
+  }
+  .op-title {
+    font-size: 28px;
+  }
+}

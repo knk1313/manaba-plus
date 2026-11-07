@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>manaba plus の設定</title>
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="op-main">
+      <h1 class="op-title">manaba plus の設定</h1>
+      <p class="op-lead">締切の色分け、モジュールの期間、時間割の表示を変えられます。</p>
+
+      <div id="banner" class="op-banner" role="status" hidden></div>
+
+      <form id="settings-form" novalidate>
+        <section class="op-section" aria-labelledby="h-thresholds">
+          <h2 id="h-thresholds" class="op-h2">締切の色分け</h2>
+          <p class="op-support">締切までの残り時間が、それぞれの時間以内のときに、その色で表示します。時間は1以上の整数で、上から順に大きくしてください。</p>
+          <div class="op-fields-row">
+            <div class="op-field">
+              <label for="th-urgent" class="op-label">緊急（橙）</label>
+              <div class="op-input-unit"><input id="th-urgent" class="op-input op-input--num" type="number" inputmode="numeric" min="1" step="1" required /><span>時間以内</span></div>
+              <p id="th-urgent-error" class="op-error" hidden></p>
+            </div>
+            <div class="op-field">
+              <label for="th-soon" class="op-label">近い（黄）</label>
+              <div class="op-input-unit"><input id="th-soon" class="op-input op-input--num" type="number" inputmode="numeric" min="1" step="1" required /><span>時間以内</span></div>
+              <p id="th-soon-error" class="op-error" hidden></p>
+            </div>
+            <div class="op-field">
+              <label for="th-week" class="op-label">今週（緑）</label>
+              <div class="op-input-unit"><input id="th-week" class="op-input op-input--num" type="number" inputmode="numeric" min="1" step="1" required /><span>時間以内</span></div>
+              <p id="th-week-error" class="op-error" hidden></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="op-section" aria-labelledby="h-modules">
+          <h2 id="h-modules" class="op-h2">モジュールの期間</h2>
+          <p class="op-support">時間割を開いたときに、今日がどのモジュールかを決めるのに使います。期間は年度ごとに変わるため、大学の学年暦を見て直してください。どの期間にも入らない日は、直後のモジュールを選びます。</p>
+          <div class="op-field">
+            <label for="mod-year" class="op-label">年度</label>
+            <div class="op-select-wrap"><select id="mod-year" class="op-select"></select></div>
+          </div>
+          <table class="op-table">
+            <caption class="op-visually-hidden">モジュールごとの開始日と終了日</caption>
+            <thead>
+              <tr><th scope="col">モジュール</th><th scope="col">開始日</th><th scope="col">終了日</th></tr>
+            </thead>
+            <tbody id="mod-rows"></tbody>
+          </table>
+          <p id="mod-error" class="op-error" tabindex="-1" hidden></p>
+          <p id="mod-note" class="op-support"></p>
+          <button type="button" id="mod-reset" class="op-button op-button--text">この年度を既定の期間に戻す</button>
+        </section>
+
+        <section class="op-section" aria-labelledby="h-panel">
+          <h2 id="h-panel" class="op-h2">時間割の表示</h2>
+          <fieldset class="op-fieldset">
+            <legend class="op-label">はじめて開いたときの時間割</legend>
+            <p class="op-support">開閉した後は、最後の状態を保ちます。</p>
+            <label class="op-radio"><input type="radio" name="panel-default" value="open" /><span>開いておく</span></label>
+            <label class="op-radio"><input type="radio" name="panel-default" value="closed" /><span>閉じておく</span></label>
+          </fieldset>
+          <label class="op-checkbox"><input type="checkbox" id="always-sat" /><span>土曜の授業がなくても、土曜の列を表示する</span></label>
+        </section>
+
+        <div class="op-actions">
+          <button type="submit" class="op-button op-button--primary">保存する</button>
+        </div>
+      </form>
+
+      <section class="op-section" aria-labelledby="h-data">
+        <h2 id="h-data" class="op-h2">保存したデータの削除</h2>
+        <div class="op-data-item">
+          <div>
+            <h3 class="op-h3">時間割のキャッシュ</h3>
+            <p class="op-support">読み込んだコースの一覧です。6時間たつと自動で読み込み直します。</p>
+          </div>
+          <button type="button" id="clear-cache" class="op-button op-button--outline">キャッシュを削除</button>
+        </div>
+        <div class="op-data-item">
+          <div>
+            <h3 class="op-h3">非表示にした課題の記録</h3>
+            <p class="op-support" id="hidden-count">読み込んでいます</p>
+          </div>
+          <button type="button" id="clear-hidden" class="op-button op-button--outline op-button--danger">記録をすべて削除</button>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="confirm-hidden" class="op-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-body">
+      <h2 id="confirm-title" class="op-h2">非表示にした課題の記録を削除する</h2>
+      <p id="confirm-body">削除すると、非表示にしたすべての課題が、未提出課題の一覧にまた表示されます。削除した記録は元に戻せません。</p>
+      <div class="op-dialog__actions">
+        <button type="button" value="cancel" class="op-button op-button--outline" id="confirm-cancel">キャンセル</button>
+        <button type="button" value="ok" class="op-button op-button--primary op-button--danger-fill" id="confirm-ok">削除する</button>
+      </div>
+    </dialog>
+
+    <script src="options.js"></script>
+  </body>
+</html>
