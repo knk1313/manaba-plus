@@ -10,6 +10,7 @@ mkdirSync(out, { recursive: true });
 
 function copyStatic() {
   cpSync("manifest.json", `${out}/manifest.json`);
+  cpSync("icons", `${out}/icons`, { recursive: true });
   cpSync("src/options/options.html", `${out}/options.html`);
   // content script の CSS は、トークンと各機能の CSS を 1 つにまとめる
   const css = ["src/content/tokens.css", "src/content/timetable/style.css", "src/content/assignments/style.css"]
