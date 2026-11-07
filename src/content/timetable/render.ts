@@ -1,6 +1,7 @@
 // 時間割パネルの描画。データの取得と保存は index.ts が受け持つ。
 import { MODS, TERMS, type Mod, type Term } from "../../lib/settings";
-import { chevronIcon, h, uniqueId } from "../dom";
+import { h, uniqueId } from "../dom";
+import { icon } from "../icons";
 import { matchesSelection, type Selection } from "./module";
 import { DAYS, type Course, type Day } from "./parser";
 
@@ -173,7 +174,7 @@ export class TimetablePanel {
     this.toggle = h(
       "button",
       { type: "button", class: "mp-tt__toggle", "aria-expanded": String(open), "aria-controls": bodyId },
-      chevronIcon(),
+      icon("chevron", 16),
       // 大きさの違う見出しと年度・モジュールは、ベースラインでそろえる
       h("span", { class: "mp-tt__toggle-text" }, h("span", { id: titleId, class: "mp-tt__title" }, "時間割"), this.summary),
     );
@@ -219,7 +220,7 @@ export class TimetablePanel {
       h(
         "div",
         { class: "mp-tt__controls" },
-        h("div", { class: "mp-field" }, h("label", { for: yearId, class: "mp-field-label" }, "年度"), h("div", { class: "mp-select-wrap" }, this.yearSelect, chevronIcon())),
+        h("div", { class: "mp-field" }, h("label", { for: yearId, class: "mp-field-label" }, "年度"), h("div", { class: "mp-select-wrap" }, this.yearSelect, icon("chevron", 16))),
         terms.fieldset,
         mods.fieldset,
         h("div", { class: "mp-tt__reload" }, this.reloadButton, this.status),

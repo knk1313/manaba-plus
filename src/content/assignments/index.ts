@@ -2,7 +2,8 @@
 import { warn } from "../../lib/log";
 import type { Thresholds } from "../../lib/settings";
 import { getHiddenAll, getLocal, getSettings, KEYS, removeHidden, setHidden, setLocal, type HiddenEntry } from "../../lib/storage";
-import { h, icon, uniqueId, type IconName } from "../dom";
+import { h, uniqueId } from "../dom";
+import { icon, type IconName } from "../icons";
 import { classify, compareByDeadline, formatRemaining, isExpiredHidden, LEVEL_LABEL, LEVELS, type Level } from "./deadline";
 import { findAssignmentTable, type Assignment, type AssignmentTable } from "./parser";
 
