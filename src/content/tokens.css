@@ -64,6 +64,10 @@
   --mp-error-surface: var(--mp-red-50);
   --mp-focus: var(--mp-black);
   --mp-focus-ring: var(--mp-yellow-300);
+  /* DADS フォーカス：黒 4px のアウトラインに黄色 2px の帯（outline / outline-offset / box-shadow に使う） */
+  --mp-focus-outline: 4px solid var(--mp-focus);
+  --mp-focus-offset: 2px;
+  --mp-focus-shadow: 0 0 0 2px var(--mp-focus-ring);
 
   --mp-radius-4: 4px;
   --mp-radius-6: 6px;

@@ -124,9 +124,9 @@ table.stdlist.mp-as-table tr td.mp-as-type a:hover {
   background: var(--mp-primary-surface);
 }
 table.stdlist.mp-as-table tr td.mp-as-type a:focus-visible {
-  outline: 4px solid var(--mp-focus);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px var(--mp-focus-ring);
+  outline: var(--mp-focus-outline);
+  outline-offset: var(--mp-focus-offset);
+  box-shadow: var(--mp-focus-shadow);
 }
 table.stdlist.mp-as-table tr td:nth-child(3) {
   font-size: 14px;
@@ -340,9 +340,9 @@ td.mp-as-title-cell .myassignments-title {
   text-decoration: underline;
 }
 .mp-switch__input:focus-visible + .mp-switch__track {
-  outline: 4px solid var(--mp-focus);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px var(--mp-focus-ring);
+  outline: var(--mp-focus-outline);
+  outline-offset: var(--mp-focus-offset);
+  box-shadow: var(--mp-focus-shadow);
 }
 @media (forced-colors: active) {
   .mp-switch__input:checked + .mp-switch__track::after {

@@ -17,9 +17,9 @@ body {
   background: var(--mp-gray-50);
 }
 :focus-visible {
-  outline: 4px solid var(--mp-focus);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px var(--mp-focus-ring);
+  outline: var(--mp-focus-outline);
+  outline-offset: var(--mp-focus-offset);
+  box-shadow: var(--mp-focus-shadow);
 }
 [hidden] {
   display: none !important;
