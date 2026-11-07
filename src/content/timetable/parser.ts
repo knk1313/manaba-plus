@@ -1,5 +1,5 @@
 // ホームのコース一覧（HTML）から、コースと時限を読み取る。DOM は読むだけで変えない。
-import type { Mod, Term } from "../../lib/settings";
+import type { Mod, Term } from "../../lib/modulePeriods";
 import { textOf } from "../../lib/text";
 
 export const DAYS = ["月", "火", "水", "木", "金", "土", "日"] as const;

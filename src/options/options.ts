@@ -1,18 +1,15 @@
 // F4：オプション画面。
 import { academicYear } from "../content/timetable/module";
 import {
+  builtinPeriods,
   dateInYear,
-  DEFAULT_PERIODS,
+  hasBuiltinCalendar,
   MODULE_KEYS,
-  normalizeSettings,
-  periodsForYear,
   validatePeriods,
-  validateThresholds,
   type ModuleKey,
   type ModulePeriods,
-  type Settings,
-  type Thresholds,
-} from "../lib/settings";
+} from "../lib/modulePeriods";
+import { normalizeSettings, periodsForYear, validateThresholds, type Settings, type Thresholds } from "../lib/settings";
 import { clearHiddenAll, clearTimetableCache, getHiddenAll, getSettings, saveSettings } from "../lib/storage";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -77,9 +74,17 @@ function renderModuleRows(): void {
     }
     tbody.append(tr);
   }
-  const overridden = settings.modulePeriodsByYear[String(currentYear)] !== undefined || editing.has(currentYear);
-  $("mod-note").textContent = overridden ? `${currentYear}年度は、変更した期間を使っています。` : `${currentYear}年度は、既定の期間を使っています。`;
+  $("mod-note").textContent = periodsNote(currentYear);
   setError(null, $("mod-error"), "");
+}
+
+/** その年度に、どの期間を使っているかの説明。 */
+function periodsNote(year: number): string {
+  const overridden = settings.modulePeriodsByYear[String(year)] !== undefined || editing.has(year);
+  if (overridden) return `${year}年度は、ここで変更した期間を使っています。`;
+  return hasBuiltinCalendar(year)
+    ? `${year}年度は、拡張機能に入っている学年暦の期間を使っています。`
+    : `${year}年度は、目安の期間を使っています。大学の学年暦と違うときは直してください。`;
 }
 
 function onModuleInput(e: Event): void {
@@ -162,7 +167,8 @@ async function onSubmit(e: SubmitEvent): Promise<void> {
   for (const [year, periods] of editing) {
     const diff: Partial<ModulePeriods> = {};
     for (const key of MODULE_KEYS) {
-      if (periods[key].start !== DEFAULT_PERIODS[key].start || periods[key].end !== DEFAULT_PERIODS[key].end) diff[key] = periods[key];
+      const base = builtinPeriods(year)[key];
+      if (periods[key].start !== base.start || periods[key].end !== base.end) diff[key] = periods[key];
     }
     if (Object.keys(diff).length > 0) byYear[String(year)] = diff;
     else delete byYear[String(year)];
@@ -202,9 +208,9 @@ async function main(): Promise<void> {
     renderModuleRows();
   });
   $("mod-reset").addEventListener("click", () => {
-    editing.set(currentYear, structuredClone(DEFAULT_PERIODS));
+    editing.set(currentYear, structuredClone(builtinPeriods(currentYear)));
     renderModuleRows();
-    $("mod-note").textContent = `${currentYear}年度を既定の期間に戻しました。「保存する」を押すと確定します。`;
+    $("mod-note").textContent = `${currentYear}年度を、拡張機能に入っている期間に戻しました。「保存する」を押すと確定します。`;
   });
   $("clear-cache").addEventListener("click", async () => {
     try {

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { academicYear, detectSelection, matchesSelection } from "../src/content/timetable/module";
 import { parseSchedule } from "../src/content/timetable/parser";
-import { DEFAULT_PERIODS, DEFAULT_SETTINGS, periodsForYear } from "../src/lib/settings";
+import { DEFAULT_PERIODS } from "../src/lib/modulePeriods";
+import { DEFAULT_SETTINGS, periodsForYear } from "../src/lib/settings";
 
 const d = (s: string) => {
   const [y, m, day] = s.split("-").map(Number) as [number, number, number];

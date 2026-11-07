@@ -1,5 +1,5 @@
 // 時間割パネルの描画。データの取得と保存は index.ts が受け持つ。
-import { MODS, TERMS, type Mod, type Term } from "../../lib/settings";
+import { MODS, TERMS, type Mod, type Term } from "../../lib/modulePeriods";
 import { h, uniqueId } from "../dom";
 import { icon } from "../icons";
 import { matchesSelection, type Selection } from "./module";

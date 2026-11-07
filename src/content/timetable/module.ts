@@ -1,5 +1,5 @@
 // 日付から年度・学期・モジュールを決める。表示するコースの絞り込みもここに置く。
-import { dateInYear, dayNumber, MODULE_KEYS, type Mod, type ModuleKey, type ModulePeriods, type Term } from "../../lib/settings";
+import { dateInYear, dayNumber, MODULE_KEYS, type Mod, type ModuleKey, type ModulePeriods, type Term } from "../../lib/modulePeriods";
 import type { Schedule } from "./parser";
 
 export type Selection = { year: number; term: Term; module: Mod };
