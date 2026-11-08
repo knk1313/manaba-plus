@@ -9,7 +9,6 @@
     "test": "vitest run",
     "check": "npm run typecheck && npm test"
   },
-  "license": "MIT",
   "type": "module",
   "devDependencies": {
     "@types/chrome": "^0.3.7",
